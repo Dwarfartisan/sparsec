@@ -137,7 +137,7 @@ func bind_<T, R, S:CollectionType >(x: CPS<T, R, S>.Parser,
 }
 infix operator >> { associativity left }
 func >><T, R, S:CollectionType>(x: CPS<T, R, S>.Parser, y:CPS<T, R, S>.Passing)  -> CPS<T, R, S>.Passing {
-    return x >> y
+    return bind_(x, y)
 }
 
 func between<T, S:CollectionType>(b:Parsec<T, S>.Parser, e:Parsec<T, S>.Parser,

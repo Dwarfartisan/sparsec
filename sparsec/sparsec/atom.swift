@@ -62,5 +62,16 @@ func fail<S:CollectionType>(message:String)->Parsec<S.Generator.Element, S>.Pars
     }
 }
 
+let unsignedFloat = bind(many(digit), {(x: [UChr?]?)->Parsec<UStr, UStr>.Parser in
+    return {(state:BasicState<UStr>)->(UStr?, ParsecStatus) in
+        var (re, status) = bind_(char("."), many1(digit))(state)
+        switch status {
+        case .Success:
+            return (nil, ParsecStatus.Success)
+        case .Failed:
+            return (nil, ParsecStatus.Failed("Except a Unsigned Float token but failed."))
+        }
+    }
+})
 
 
