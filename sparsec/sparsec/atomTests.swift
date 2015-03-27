@@ -40,11 +40,25 @@ class atomTests: XCTestCase {
         // This is an example of a functional test case.
         let data = "07500"
         let state = BasicState(data.unicodeScalars)
-        let d = digit
+        let d = manyTil(digit, eof)
         var (re, status) = d(state)
         switch status {
         case let .Failed(msg):
             XCTAssert(false, "excpet digit parsec got a digit but error: \(msg)")
+        case .Success:
+            XCTAssert(true, "pass")
+        }
+    }
+    
+    func testFloat() {
+        // This is an example of a functional test case.
+        let data = "2.3"
+        let state = BasicState(data.unicodeScalars)
+        let d = unsignedFloat
+        var (re, status) = d(state)
+        switch status {
+        case let .Failed(msg):
+            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
         case .Success:
             XCTAssert(true, "pass")
         }
