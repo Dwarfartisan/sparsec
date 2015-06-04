@@ -122,3 +122,21 @@ func cs2str(cs:[UChr?]) -> String {
     }
     return String(re)
 }
+
+func ucs2us(cs:[UnicodeScalar?]) -> UStr {
+    var re = "".unicodeScalars
+    var values = unbox(cs)
+    for c in  values {
+        re.append(c)
+    }
+    return re
+}
+
+func ucs2str(cs:[UnicodeScalar?]) -> String {
+    var re = "".unicodeScalars
+    var values = unbox(cs)
+    for c in  values {
+        re.append(c)
+    }
+    return String(re)
+}

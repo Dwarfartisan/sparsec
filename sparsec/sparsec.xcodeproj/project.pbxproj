@@ -53,7 +53,7 @@
 		39DB5C441AA6D2860069AA30 /* sparsec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sparsec.h; sourceTree = "<group>"; };
 		39DB5C4A1AA6D2860069AA30 /* sparsecTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sparsecTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		39DB5C501AA6D2860069AA30 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		39DB5C511AA6D2860069AA30 /* sparsecTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sparsecTests.swift; sourceTree = "<group>"; };
+		39DB5C511AA6D2860069AA30 /* sparsecTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = sparsecTests.swift; sourceTree = "<group>"; };
 		F1034A141ACE6C6B0017C1B0 /* defineTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = defineTests.swift; path = sparsecTests/defineTests.swift; sourceTree = SOURCE_ROOT; };
 		F1034A161ACE75CB0017C1B0 /* propsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = propsTests.swift; sourceTree = "<group>"; };
 		F1034A181ACE75E50017C1B0 /* atomTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = atomTests.swift; sourceTree = "<group>"; };

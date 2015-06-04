@@ -68,8 +68,8 @@ func option<T, S:CollectionType>(parsec:Parsec<T, S>.Parser, value:T?) -> Parsec
         return parsec <|> pack(value)
 }
 
-func oneOf<T:Equatable, C:CollectionType, S:CollectionType
-    where S.Generator.Element==T, C.Generator.Element==T>(elements:C)->Parsec<T, S>.Parser {
+func oneOf<T:Equatable, Es:SequenceType, S:CollectionType
+    where S.Generator.Element==T, Es.Generator.Element==T>(elements:Es)->Parsec<T, S>.Parser {
     return {(state: BasicState<S>) -> (T?, ParsecStatus) in
         var re = state.next()
         if re == nil {
@@ -85,8 +85,8 @@ func oneOf<T:Equatable, C:CollectionType, S:CollectionType
     }
 }
 
-func noneOf<T:Equatable, C:CollectionType, S:CollectionType
-        where C.Generator.Element==T, S.Generator.Element==T>(elements:C)->Parsec<T, S>.Parser {
+func noneOf<T:Equatable, Es:SequenceType, S:CollectionType
+        where Es.Generator.Element==T, S.Generator.Element==T>(elements:Es)->Parsec<T, S>.Parser {
     return {(state: BasicState<S>) -> (T?, ParsecStatus) in
         var re = state.next()
         if re == nil {
@@ -103,8 +103,8 @@ func noneOf<T:Equatable, C:CollectionType, S:CollectionType
     }
 }
 
-func bind<T, R, S:CollectionType >(x:CPS<T, R, S>.Parser,
-        binder:CPS<T, R, S>.Continuation) -> CPS<T, R, S>.Passing {
+func bind<T, R, S:CollectionType >(x:Parsec<T, S>.Parser,
+        binder:(T?)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
     return {(state: BasicState<S>) -> (R?, ParsecStatus) in
         var (re, status) = x(state)
         switch status {
@@ -117,7 +117,7 @@ func bind<T, R, S:CollectionType >(x:CPS<T, R, S>.Parser,
     }
 }
 infix operator >>= { associativity left }
-func >>= <T, R, S:CollectionType>(x: CPS<T, R, S>.Parser, binder:CPS<T, R, S>.Continuation) -> CPS<T, R, S>.Passing {
+func >>= <T, R, S:CollectionType>(x: Parsec<T, S>.Parser, binder:(T?)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
     return bind(x, binder)
 }
 
