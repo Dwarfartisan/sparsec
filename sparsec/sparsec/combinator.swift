@@ -73,7 +73,7 @@ func oneOf<T:Equatable, Es:SequenceType, S:CollectionType
     return {(state: BasicState<S>) -> (T?, ParsecStatus) in
         var re = state.next()
         if re == nil {
-            return (nil, ParsecStatus.Failed("Except one of [\(elements)] but Eof"))
+            return (nil, ParsecStatus.Failed("Expect one of [\(elements)] but Eof"))
         }
         
         for e in elements {
@@ -95,7 +95,7 @@ func noneOf<T:Equatable, Es:SequenceType, S:CollectionType
         
         for e in elements {
             if e == re! {
-                var message = "Except None match [\(elements)] but found \(e)"
+                var message = "Expect None match [\(elements)] but found \(e)"
                 return (e, ParsecStatus.Failed(message))
             }
         }

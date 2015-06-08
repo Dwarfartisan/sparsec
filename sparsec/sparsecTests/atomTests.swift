@@ -54,14 +54,14 @@ class atomTests: XCTestCase {
         let x:Int? = 12
         let y:Int? = 23
         var r:Int? = fmap(x, y, {(x, y)->Int in return x+y})
-        XCTAssert(r!==35, "Except a int? is 35 but got \(r)")
+        XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
     
     func testFMapOperator() {
         let x:Int? = 12
         let y:Int? = 23
         var r:Int? = fmap(x, y, +)
-        XCTAssert(r!==35, "Except a int? is 35 but got \(r)")
+        XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
     func testFMapCurry() {
@@ -71,7 +71,7 @@ class atomTests: XCTestCase {
              return {(left:Int)->Int in return left+right}
         }
         var r:Int? = fmap(x, fmap(y, fun))
-        XCTAssert(r!==35, "Except a int? is 35 but got \(r)")
+        XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
     func testOne1() {

@@ -16,9 +16,9 @@ func one<T:Equatable, S:CollectionType where S.Generator.Element==T>(one: T)->Pa
         case .Success:
             return (one, ParsecStatus.Success)
         case .Failed:
-            return (nil, ParsecStatus.Failed("Except \(one) but \(state[state.pos]) missmatch."))
+            return (nil, ParsecStatus.Failed("Expect \(one) but \(state[state.pos]) missmatch."))
         case .Eof:
-            return (nil, ParsecStatus.Failed("Except \(one) but \(state[state.pos]) Eof."))
+            return (nil, ParsecStatus.Failed("Expect \(one) but \(state[state.pos]) Eof."))
         }
     }
 }
@@ -32,9 +32,9 @@ func subject<T:Equatable, S:CollectionType where S.Generator.Element==T >
         case .Success:
             return (one, ParsecStatus.Success)
         case .Failed:
-            return (nil, ParsecStatus.Failed("Except \(one) but \(state[state.pos]) missmatch."))
+            return (nil, ParsecStatus.Failed("Expect \(one) but \(state[state.pos]) missmatch."))
         case .Eof:
-            return (nil, ParsecStatus.Failed("Except \(one) but \(state[state.pos]) Eof."))
+            return (nil, ParsecStatus.Failed("Expect \(one) but \(state[state.pos]) Eof."))
         }
     }
 }
@@ -44,7 +44,7 @@ func eof<S:CollectionType>(state: BasicState<S>)->(S.Generator.Element?, ParsecS
     if item == nil {
         return (nil, ParsecStatus.Success)
     } else {
-        return (item, ParsecStatus.Failed("Except Eof but \(item) at \(state.pos)"))
+        return (item, ParsecStatus.Failed("Expect Eof but \(item) at \(state.pos)"))
     }
 }
 

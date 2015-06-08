@@ -27,9 +27,9 @@ func charSet(title:String, charSet:NSCharacterSet)->Parsec<UChr, UStr>.Parser {
         case let .Success(value):
             return (value, ParsecStatus.Success)
         case .Failed:
-            return (nil, ParsecStatus.Failed("Except \(title) at \(state.pos) but not match."))
+            return (nil, ParsecStatus.Failed("Expect \(title) at \(state.pos) but not match."))
         case .Eof:
-            return (nil, ParsecStatus.Failed("Except \(title) but Eof."))
+            return (nil, ParsecStatus.Failed("Expect \(title) but Eof."))
         }
     }
 }
@@ -82,7 +82,7 @@ let int = option(try(char("-")), nil) >>= {(x:UChr?)->Parsec<UStr, UStr>.Parser 
                 return (s.unicodeScalars, ParsecStatus.Success)
             }
         case .Failed:
-            return (nil, ParsecStatus.Failed("Except a Unsigned Integer token but failed."))
+            return (nil, ParsecStatus.Failed("Expect a Unsigned Integer token but failed."))
         }
     }
 }
@@ -93,7 +93,7 @@ func text(value:String)->Parsec<String, String.UnicodeScalarView>.Parser {
         for idx in scalars.startIndex...scalars.endIndex {
             var re = state.next()
             if re == nil {
-                return (nil, ParsecStatus.Failed("Except Text \(value) but Eof"))
+                return (nil, ParsecStatus.Failed("Expect Text \(value) but Eof"))
             } else {
                 var rune = re!
                 if rune != scalars[idx] {
