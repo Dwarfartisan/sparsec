@@ -22,7 +22,7 @@ func charSet(title:String, charSet:NSCharacterSet)->Parsec<UChr, UStr>.Parser {
         return charSet.longCharacterIsMember(c.value)
     }
     return {(state:BasicState<UStr>)->(UChr?, ParsecStatus) in
-        var pre = state.next(pred)
+        let pre = state.next(pred)
         switch pre {
         case let .Success(value):
             return (value, ParsecStatus.Success)
@@ -34,11 +34,11 @@ func charSet(title:String, charSet:NSCharacterSet)->Parsec<UChr, UStr>.Parser {
     }
 }
 
-let digit = charSet("digit", digits)
-let letter = charSet("letter", letters)
-let space = charSet("space", spaces)
-let sol = charSet("space or newline", spacesAndNewlines)
-let newline = charSet("newline", newlines)
+let digit = charSet("digit", charSet: digits)
+let letter = charSet("letter", charSet: letters)
+let space = charSet("space", charSet: spaces)
+let sol = charSet("space or newline", charSet: spacesAndNewlines)
+let newline = charSet("newline", charSet: newlines)
 
 let unsignedFloat = many(digit) >>= {(n:[UChr?]?)->Parsec<String, UStr>.Parser in
     return {(state:BasicState<UStr>)->(String?, ParsecStatus) in
@@ -52,7 +52,7 @@ let unsignedFloat = many(digit) >>= {(n:[UChr?]?)->Parsec<String, UStr>.Parser i
     }
 }
 
-let float = try(unsignedFloat) <|> (char("-") >> {(state: BasicState<UStr>)->(String?, ParsecStatus) in
+let float = `try`(unsignedFloat) <|> (char("-") >> {(state: BasicState<UStr>)->(String?, ParsecStatus) in
     var (re, status) = unsignedFloat(state)
     switch status {
     case .Success:
@@ -70,7 +70,7 @@ let uint = many1(digit) >>= {(x:[UChr?]?)->Parsec<UStr, UStr>.Parser in
     return pack(cs2us(x!))
 }
 
-let int = option(try(char("-")), nil) >>= {(x:UChr?)->Parsec<UStr, UStr>.Parser in
+let int = option(`try`(char("-")), value: nil) >>= {(x:UChr?)->Parsec<UStr, UStr>.Parser in
     return {(state:BasicState<UStr>)->(UStr?, ParsecStatus) in
         var (re, status) = uint(state)
         switch status {
@@ -91,11 +91,11 @@ func text(value:String)->Parsec<String, String.UnicodeScalarView>.Parser {
     return {(state: BasicState<String.UnicodeScalarView>)->(String?, ParsecStatus) in
         var scalars = value.unicodeScalars
         for idx in scalars.startIndex...scalars.endIndex {
-            var re = state.next()
+            let re = state.next()
             if re == nil {
                 return (nil, ParsecStatus.Failed("Expect Text \(value) but Eof"))
             } else {
-                var rune = re!
+                let rune = re!
                 if rune != scalars[idx] {
                     return (nil, ParsecStatus.Failed("Text[\(idx)]:\(scalars[idx]) not match Data[\(state.pos)]:\(rune)"))
                 }
@@ -107,7 +107,7 @@ func text(value:String)->Parsec<String, String.UnicodeScalarView>.Parser {
 
 func cs2us(cs:[UChr?]) -> UStr {
     var re = "".unicodeScalars
-    var values = unbox(cs)
+    let values = unbox(cs)
     for c in  values {
         re.append(c)
     }
@@ -116,7 +116,7 @@ func cs2us(cs:[UChr?]) -> UStr {
 
 func cs2str(cs:[UChr?]) -> String {
     var re = "".unicodeScalars
-    var values = unbox(cs)
+    let values = unbox(cs)
     for c in  values {
         re.append(c)
     }
@@ -125,7 +125,7 @@ func cs2str(cs:[UChr?]) -> String {
 
 func ucs2us(cs:[UnicodeScalar?]) -> UStr {
     var re = "".unicodeScalars
-    var values = unbox(cs)
+    let values = unbox(cs)
     for c in  values {
         re.append(c)
     }
@@ -134,7 +134,7 @@ func ucs2us(cs:[UnicodeScalar?]) -> UStr {
 
 func ucs2str(cs:[UnicodeScalar?]) -> String {
     var re = "".unicodeScalars
-    var values = unbox(cs)
+    let values = unbox(cs)
     for c in  values {
         re.append(c)
     }

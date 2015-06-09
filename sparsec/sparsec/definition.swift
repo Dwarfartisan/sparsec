@@ -44,7 +44,7 @@ func fmap<P, Q, R>(x:P?, y:Q?, functor:((P, Q)->R)?)->R? {
     if x==nil || y == nil || functor == nil {
         return nil
     } else {
-        return fmap(y, {(yj:Q)->R in
+        return fmap(y, functor: {(yj:Q)->R in
             return functor!(x!, yj)
         })
     }
@@ -68,6 +68,6 @@ func unbox<T>(box:[T?], force:Bool=false)->[T] {
 
 extension String: CollectionType {}
 
-extension String.UnicodeScalarView:CollectionType{}
+//extension String.UnicodeScalarView:CollectionType{}
 
 

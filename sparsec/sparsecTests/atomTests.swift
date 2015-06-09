@@ -27,7 +27,7 @@ class atomTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c:UnicodeScalar = "T"
         let t = char(c)
-        var (re, status) = t(state)
+        let (_, status) = t(state)
         switch status {
         case .Success:
             XCTAssert(true, "pass")
@@ -41,7 +41,7 @@ class atomTests: XCTestCase {
         let data = "07500"
         let state = BasicState(data.unicodeScalars)
         let num = digit
-        var (re, status) = num(state)
+        let (_, status) = num(state)
         switch status {
         case let .Failed(msg):
             XCTAssert(false, "excpet digit parsec got a digit but error: \(msg)")
@@ -53,14 +53,14 @@ class atomTests: XCTestCase {
     func testFMapFunction() {
         let x:Int? = 12
         let y:Int? = 23
-        var r:Int? = fmap(x, y, {(x, y)->Int in return x+y})
+        let r:Int? = fmap(x, y: y, functor: {(x, y)->Int in return x+y})
         XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
     
     func testFMapOperator() {
         let x:Int? = 12
         let y:Int? = 23
-        var r:Int? = fmap(x, y, +)
+        let r:Int? = fmap(x, y: y, functor: +)
         XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
@@ -70,7 +70,7 @@ class atomTests: XCTestCase {
         let fun = {(right:Int)->(Int)->Int in
              return {(left:Int)->Int in return left+right}
         }
-        var r:Int? = fmap(x, fmap(y, fun))
+        let r:Int? = fmap(x, functor: fmap(y, functor: fun))
         XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
@@ -78,7 +78,7 @@ class atomTests: XCTestCase {
         let data = "b"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        var (re, status) = one(c)(state)
+        let (_, status) = one(c)(state)
         switch status {
         case .Success:
             XCTAssert(true, "pass")
@@ -91,7 +91,7 @@ class atomTests: XCTestCase {
         let data = " "
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = " "
-        var (re, status) = one(c)(state)
+        let (_, status) = one(c)(state)
         switch status {
         case .Success:
             XCTAssert(true, "pass")

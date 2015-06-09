@@ -27,8 +27,8 @@ class combTests: XCTestCase {
         let data = "t1"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        var (re, status) = try(one(c))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = `try`(one(c))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true, "pass")
@@ -42,8 +42,8 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        var (re, status) = either(try(one(c)), one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = either(`try`(one(c)), y: one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true, "pass")
@@ -57,12 +57,12 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        var (re, status) = either(one(c), one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = either(one(c), y: one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data[0] is equal to c but got error")
-        case let .Failed(msg):
+        case .Failed:
             XCTAssert(true)
         }
     }
@@ -72,12 +72,12 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "v"
-        var (re, status) = either(try(one(c)), one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = either(`try`(one(c)), y: one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data is neither equal to c nor to d")
-        case let .Failed(msg):
+        case .Failed:
             XCTAssert(true)
         }
     }
@@ -87,8 +87,8 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        var (re, status) = (try(one(c)) <|> one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = (`try`(one(c)) <|> one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true, "pass")
@@ -102,12 +102,12 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        var (re, status) = (one(c) <|> one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = (one(c) <|> one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data[0] is equal to c but error")
-        case let .Failed(msg):
+        case .Failed:
             XCTAssert(true)
         }
     }
@@ -117,12 +117,12 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "v"
-        var (re, status) = (try(one(c)) <|> one(d))(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = (`try`(one(c)) <|> one(d))(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data is neither equal to c nor to d")
-        case let .Failed(msg):
+        case .Failed:
             XCTAssert(true)
         }
     }
@@ -131,8 +131,8 @@ class combTests: XCTestCase {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        var (re, status) = otherwise(one(c), "data is not equal to c")(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = otherwise(one(c), message: "data is not equal to c")(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true)
@@ -145,8 +145,8 @@ class combTests: XCTestCase {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        var (re, status) = otherwise(one(c), "data is not equal to c")(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = otherwise(one(c), message: "data is not equal to c")(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false)
@@ -159,8 +159,8 @@ class combTests: XCTestCase {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        var (re, status) = (one(c) <?> "data is not equal to c")(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = (one(c) <?> "data is not equal to c")(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true)
@@ -173,8 +173,8 @@ class combTests: XCTestCase {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        var (re, status) = (one(c) <?> "data is not equal to c")(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = (one(c) <?> "data is not equal to c")(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false)
@@ -189,8 +189,8 @@ class combTests: XCTestCase {
         let c: UnicodeScalar = "1"
         let d: UnicodeScalar = "d"
 
-        var (re, status) = option(try(one(c)), d)(state)
-        println("(re, status): \((re, status))")
+        let (re, status) = option(`try`(one(c)), value: d)(state)
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(re==d, "re is \(re) and equal to \(d)")
@@ -204,9 +204,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        var (re, status) = oneOf(c.unicodeScalars)(state)
+        let (re, status) = oneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true)
@@ -220,9 +220,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        var (re, status) = oneOf(c.unicodeScalars)(state)
+        let (re, status) = oneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data is not in c")
@@ -236,9 +236,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs 2ad1"
         
-        var (re, status) = oneOf(c.unicodeScalars)(state)
+        let (re, status) = oneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true, "data \(data) is not in c \(c)")
@@ -252,9 +252,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        var (re, status) = noneOf(c.unicodeScalars)(state)
+        let (re, status) = noneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(true)
@@ -268,9 +268,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        var (re, status) = noneOf(c.unicodeScalars)(state)
+        let (re, status) = noneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data is not in c")
@@ -284,9 +284,9 @@ class combTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c = "3fs 2a d1"
         
-        var (re, status) = noneOf(c.unicodeScalars)(state)
+        let (re, status) = noneOf(c.unicodeScalars)(state)
         
-        println("(re, status): \((re, status))")
+        print("(re, status): \((re, status))")
         switch status {
         case .Success:
             XCTAssert(false, "data \(data) is not in c \(c)")

@@ -9,9 +9,9 @@
 import Foundation
 
 func one<T:Equatable, S:CollectionType where S.Generator.Element==T>(one: T)->Parsec<T, S>.Parser{
-    var pred = equals(one)
+    let pred = equals(one)
     return {(state: BasicState<S>)->(T?, ParsecStatus) in
-        var re = state.next(pred)
+        let re = state.next(pred)
         switch re {
         case .Success:
             return (one, ParsecStatus.Success)
@@ -25,9 +25,9 @@ func one<T:Equatable, S:CollectionType where S.Generator.Element==T>(one: T)->Pa
 
 func subject<T:Equatable, S:CollectionType where S.Generator.Element==T >
         (one: T, curry:(T)->(T)->Bool)->Parsec<T, S>.Parser {
-    var pred:(T)->Bool = curry(one)
+    let pred:(T)->Bool = curry(one)
     return {(state: BasicState<S>)->(T?, ParsecStatus) in
-        var re = state.next(pred)
+        let re = state.next(pred)
         switch re {
         case .Success:
             return (one, ParsecStatus.Success)
@@ -40,7 +40,7 @@ func subject<T:Equatable, S:CollectionType where S.Generator.Element==T >
 }
 
 func eof<S:CollectionType>(state: BasicState<S>)->(S.Generator.Element?, ParsecStatus){
-    var item = state.next()
+    let item = state.next()
     if item == nil {
         return (nil, ParsecStatus.Success)
     } else {

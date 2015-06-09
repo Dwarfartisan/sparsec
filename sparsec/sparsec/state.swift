@@ -21,7 +21,7 @@ class BasicState<S:CollectionType> {
         if self.pos == self.container.endIndex.successor() {
             return nil
         }
-        var item = container[self.pos]
+        let item = container[self.pos]
         self.pos = self.pos.successor()
         return item
     }
@@ -30,9 +30,9 @@ class BasicState<S:CollectionType> {
         if self.pos == self.container.endIndex.successor() {
             return PredResult<T>.Eof
         }
-        var item = container[self.pos]
+        let item = container[self.pos]
         self.pos = self.pos.successor()
-        var match = pred(item)
+        let match = pred(item)
         if match {
             self.pos.successor()
             return PredResult.Success(item)
@@ -68,7 +68,7 @@ class LinesState<S:CollectionType where S.Index: IntegerArithmeticType>:
         self.row = container.startIndex
         self.col = container.startIndex
         for index in container.startIndex ... container.endIndex {
-            var item = container[index]
+            let item = container[index]
             if newline(item) {
                 self.lines.append(index)
             }
@@ -84,9 +84,9 @@ class LinesState<S:CollectionType where S.Index: IntegerArithmeticType>:
         set(p) {
             assert((self.container.startIndex<=p) && (pos<=self.container.endIndex))
             _pos = pos
-            var top = self.lines.endIndex
+            let top = self.lines.endIndex
             for idx in self.lines.startIndex ... self.lines.endIndex {
-                var start = self.lines[idx]
+                let start = self.lines[idx]
                 var row = top - idx
                 if start < _pos {
                     row = row + 2
