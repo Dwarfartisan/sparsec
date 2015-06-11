@@ -26,18 +26,18 @@ class BasicState<S:CollectionType> {
         return item
     }
 
-    func next(pred : Equal<T>.Pred) -> PredResult<T> {
+    func next(pred : Equal<T>.Pred) -> Result<T, SimpleError<S.Index>> {
         if self.pos == self.container.endIndex.successor() {
-            return PredResult<T>.Eof
+            return Result.Failed(SimpleError(pos:self.pos, message:"eof"));
         }
         let item = container[self.pos]
         self.pos = self.pos.successor()
         let match = pred(item)
         if match {
             self.pos.successor()
-            return PredResult.Success(item)
+            return Result.Success(item)
         }
-        return PredResult.Failed
+        return Result.Failed(SimpleError(pos: self.pos, message: "predicate failed"))
     }
     subscript(idx: S.Index) -> T? {
         get {

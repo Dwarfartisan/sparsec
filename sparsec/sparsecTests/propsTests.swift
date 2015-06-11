@@ -26,12 +26,12 @@ class propsTests: XCTestCase {
         let data = "3.15926"
         let state = BasicState(data.unicodeScalars)
         let num = unsignedFloat
-        let (re, status) = num(state)
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == data, "float test success and got:\(re)")
+        let re = num(state)
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(value):
+            XCTAssert(value == data, "float test success and got:\(data)")
         }
     }
     
@@ -40,12 +40,12 @@ class propsTests: XCTestCase {
         let data = ".15926"
         let state = BasicState(data.unicodeScalars)
         let num = unsignedFloat
-        let (re, status) = num(state)
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == data, "float test success and got:\(re)")
+        let re = num(state)
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(val):
+            XCTAssert(val == data, "float test success and got:\(val)")
         }
     }
     
@@ -54,12 +54,12 @@ class propsTests: XCTestCase {
         let data = "3.15926f"
         let state = BasicState(data.unicodeScalars)
         let num = unsignedFloat
-        let (re, status) = num(state)
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == "3.15926", "float test success and got:\(re)")
+        let re = num(state)
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(value):
+            XCTAssert(value == "3.15926", "float test success and got:\(value)")
         }
     }
     
@@ -68,8 +68,8 @@ class propsTests: XCTestCase {
         let data = "315926"
         let state = BasicState(data.unicodeScalars)
         let num = unsignedFloat
-        let (_, status) = num(state)
-        switch status {
+        let re = num(state)
+        switch re {
         case .Failed:
             XCTAssert(true, "pass")
         case .Success:
@@ -82,8 +82,8 @@ class propsTests: XCTestCase {
         let data = "beras3252.242"
         let state = BasicState(data.unicodeScalars)
         let num = unsignedFloat
-        let (_, status) = num(state)
-        switch status {
+        let re = num(state)
+        switch re {
         case .Failed:
             XCTAssert(true, "pass")
         case .Success:
@@ -96,12 +96,12 @@ class propsTests: XCTestCase {
         let data = "3.15926"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (re, status) = num(state)
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == data, "float test success and got:\(re)")
+        let re = num(state)
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(value):
+            XCTAssert(value == data, "float test success and got:\(value)")
         }
     }
     
@@ -110,13 +110,13 @@ class propsTests: XCTestCase {
         let data = "-624.3"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (re, status) = num(state)
-        print("re, status : \((re, status))")
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == data, "float test success and got:\(re)")
+        let re = num(state)
+        print("result : \(re)")
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(value):
+            XCTAssert(value == data, "float test success and got:\(value)")
         }
     }
     
@@ -125,13 +125,13 @@ class propsTests: XCTestCase {
         let data = "-624.3dsfgasd"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (re, status) = num(state)
-        print("re, status : \((re, status))")
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet float parsec got a float but error: \(msg)")
-        case .Success:
-            XCTAssert(re == "-624.3", "float test success and got:\(re)")
+        let re = num(state)
+        print("re, status : \(re)")
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
+        case let .Success(value):
+            XCTAssert(value == "-624.3", "float test success and got:\(value)")
         }
     }
     
@@ -140,8 +140,8 @@ class propsTests: XCTestCase {
         let data = "-6243"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (_, status) = num(state)
-        switch status {
+        let re = num(state)
+        switch re {
         case .Failed:
             XCTAssert(true, "pass")
         case .Success:
@@ -154,8 +154,8 @@ class propsTests: XCTestCase {
         let data = "315926"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (_, status) = num(state)
-        switch status {
+        let re = num(state)
+        switch re {
         case .Failed:
             XCTAssert(true, "pass")
         case .Success:
@@ -168,8 +168,8 @@ class propsTests: XCTestCase {
         let data = "beras3252.242"
         let state = BasicState(data.unicodeScalars)
         let num = float
-        let (_, status) = num(state)
-        switch status {
+        let re = num(state)
+        switch re {
         case .Failed:
             XCTAssert(true, "pass")
         case .Success:

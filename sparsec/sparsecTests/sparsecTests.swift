@@ -27,19 +27,19 @@ class sparsecTests: XCTestCase {
                             `try`(char("t")>>pack("\t" as UnicodeScalar))
                         <|> `try`(char("n")>>pack("\n" as UnicodeScalar))
                         <|> `try`(char("\"")>>pack("\"" as UnicodeScalar))
-                        <|> {(state)->(UnicodeScalar?, ParsecStatus) in
+                        <|> {(state)->Result<UnicodeScalar, SimpleError<String.UnicodeScalarView.Index>> in
                                 let the_char = state.next({(x)->Bool in false})
-                                return (nil, ParsecStatus.Failed("unknown escape char \(the_char)"))
+                                return Result.Failed(SimpleError(pos: state.pos, message:"unknown escape char \(the_char)"))
                             })
         
-        let strExpr = many1(`try`(noneOf(("\\" as String).unicodeScalars)) <|> escape) >>= {(x:[UnicodeScalar?]?)->Parsec<[UnicodeScalar?], String.UnicodeScalarView>.Parser in
-            return eof >> pack(x!)
+        let strExpr = many1(`try`(noneOf(("\\" as String).unicodeScalars)) <|> escape) >>= {(x:[UnicodeScalar])->Parsec<[UnicodeScalar], String.UnicodeScalarView>.Parser in
+            return eof >> pack(x)
         }
         let state = BasicState(data.unicodeScalars)
-        let (re, status) = strExpr(state)
-        switch status {
-        case .Success:
-            let output = ucs2str(re!)
+        let re = strExpr(state)
+        switch re {
+        case let .Success(data):
+            let output = ucs2str(data)
             print("string test passed, got: \(output)")
         case let .Failed(msg):
             XCTAssert(false, "string test failed, got: \(msg)")

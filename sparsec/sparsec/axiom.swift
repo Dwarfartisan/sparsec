@@ -8,18 +8,16 @@
 
 import Foundation
 
-enum PredResult<T>{
+enum Result<T, E>{
     case Success(T)
-    case Failed
-    case Eof
+    case Failed(E)
 }
 
-enum ParsecStatus{
-    case Success
-    case Failed(String)
+struct SimpleError<I> {
+    let pos:I
+    let message:String
 }
 
 struct Parsec<T, S:CollectionType> {
-    typealias Parser = (BasicState<S>)->(T?, ParsecStatus)
+    typealias Parser = (BasicState<S>)->Result<T, SimpleError<S.Index>>
 }
-

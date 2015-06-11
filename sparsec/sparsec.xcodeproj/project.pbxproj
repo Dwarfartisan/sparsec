@@ -105,10 +105,10 @@
 				39DB5C421AA6D2860069AA30 /* Supporting Files */,
 				3907CE541AAEF7AC00CD70A3 /* definition.swift */,
 				3927B71B1ABEAA680018D180 /* axiom.swift */,
+				39C6B5071AB6B32000F566A0 /* combinator.swift */,
 				396335E01ABAC99C001B7208 /* proposition.swift */,
 				39D0F3171AAD6992003B56CE /* state.swift */,
 				3907CE4C1AAEF2D200CD70A3 /* atom.swift */,
-				39C6B5071AB6B32000F566A0 /* combinator.swift */,
 			);
 			path = sparsec;
 			sourceTree = "<group>";

@@ -9,32 +9,31 @@
 import Foundation
 
 func `try`<T, S:CollectionType>(parsec: Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
-    return {(state: BasicState<S>) -> (T?, ParsecStatus) in
+    return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
         let p = state.pos
-        let (re, status) = parsec(state)
-        switch status {
+        let result = parsec(state)
+        switch result {
         case .Failed:
             state.pos = p
             fallthrough
         default:
-            return (re, status)
+            return result
         }
     }
 }
 
-func either<T, S:CollectionType>(x: Parsec<T, S>.Parser, y: Parsec<T, S>.Parser)
-    -> Parsec<T, S>.Parser {
-        return {(state: BasicState<S>) -> (T?, ParsecStatus) in
+func either<T, S:CollectionType>(x: Parsec<T, S>.Parser, y: Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
+        return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
             let p = state.pos
-            let (re, status) = x(state)
-            switch status {
+            let re = x(state)
+            switch re {
             case .Success:
-                return (re, ParsecStatus.Success)
+                return re
             default:
                 if state.pos == p {
                     return y(state)
                 } else {
-                    return (re, status)
+                    return re
                 }
             }
 
@@ -48,13 +47,13 @@ func <|><T, S:CollectionType >(left: Parsec<T, S>.Parser,
 }
 
 func otherwise<T, S:CollectionType >(x:Parsec<T, S>.Parser, message:String)->Parsec<T, S>.Parser {
-    return {(state: BasicState<S>) -> (T?, ParsecStatus) in
-        let (re, status) = x(state)
-        switch status {
+    return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
+        let re = x(state)
+        switch re {
         case .Success:
-            return (re, status)
+            return re
         default:
-            return (nil, ParsecStatus.Failed(message))
+            return Result.Failed(SimpleError(pos:state.pos, message:message))
         }
     }
 }
@@ -64,112 +63,124 @@ func <?><T, S:CollectionType>(x: Parsec<T, S>.Parser, message: String)  -> Parse
     return otherwise(x, message: message)
 }
 
-func option<T, S:CollectionType>(parsec:Parsec<T, S>.Parser, value:T?) -> Parsec<T, S>.Parser {
+func option<T, S:CollectionType>(parsec:Parsec<T, S>.Parser, value:T) -> Parsec<T, S>.Parser {
         return parsec <|> pack(value)
+}
+
+func optional<T, S:CollectionType>(parsec:Parsec<T, S>.Parser) -> Parsec<T?, S>.Parser {
+    return {(state: BasicState<S>)->Result<T?, SimpleError<S.Index>> in
+        let re = parsec(state)
+        switch re {
+        case let .Success(data):
+            return Result.Success(data)
+        case let .Failed(err):
+            return Result.Failed(err)
+        }
+    }
 }
 
 func oneOf<T:Equatable, Es:SequenceType, S:CollectionType
     where S.Generator.Element==T, Es.Generator.Element==T>(elements:Es)->Parsec<T, S>.Parser {
-    return {(state: BasicState<S>) -> (T?, ParsecStatus) in
+    return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
         let re = state.next()
         if re == nil {
-            return (nil, ParsecStatus.Failed("Expect one of [\(elements)] but Eof"))
-        }
-        
-        for e in elements {
-            if e == re! {
-                return (e, ParsecStatus.Success)
+            return Result.Failed(SimpleError(pos:state.pos, message:"Expect one of [\(elements)] but eof."))
+        } else {
+            let data = re!
+            for e in elements {
+                if e == data {
+                    return Result.Success(data)
+                }
             }
         }
-        return (nil, ParsecStatus.Failed("Missmatch any one of [\(elements)]."))
+
+        return Result.Failed(SimpleError(pos:state.pos, message:"Missmatch any one of [\(elements)]."))
     }
 }
 
 func noneOf<T:Equatable, Es:SequenceType, S:CollectionType
         where Es.Generator.Element==T, S.Generator.Element==T>(elements:Es)->Parsec<T, S>.Parser {
-    return {(state: BasicState<S>) -> (T?, ParsecStatus) in
+    return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
         let re = state.next()
         if re == nil {
-            return (nil, ParsecStatus.Failed("Try to check none of [\(elements)] but Eof"))
-        }
-        
-        for e in elements {
-            if e == re! {
-                let message = "Expect None match [\(elements)] but found \(e)"
-                return (e, ParsecStatus.Failed(message))
+            return Result.Failed(SimpleError(pos:state.pos, message:"Expect one of [\(elements)] but eof."))
+        } else {
+            let data = re!
+            for e in elements {
+                if e == data {
+                    return Result.Failed(SimpleError(pos:state.pos, message:"Expect none of [\(elements)] but got \(e)"))
+                }
             }
+            return Result.Success(data)
         }
-        return (re, ParsecStatus.Success)
     }
 }
 
-func bind<T, R, S:CollectionType >(x:Parsec<T, S>.Parser,
-        binder:(T?)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
-    return {(state: BasicState<S>) -> (R?, ParsecStatus) in
-        let (re, status) = x(state)
-        switch status {
-        case .Success:
-            let postfix = binder(re)
-            return postfix(state)
-        default:
-            return (nil, status)
+func bind<T, R, S:CollectionType >(x:Parsec<T, S>.Parser, binder:(T)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+    return {(state: BasicState<S>) -> Result<R, SimpleError<S.Index>> in
+        let re = x(state)
+        switch re {
+        case let .Success(data):
+            return binder(data)(state)
+        case let .Failed(err):
+            return Result<R, SimpleError<S.Index>>.Failed(err)
         }
     }
 }
 infix operator >>= { associativity left }
-func >>= <T, R, S:CollectionType>(x: Parsec<T, S>.Parser, binder:(T?)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+func >>= <T, R, S:CollectionType>(x: Parsec<T, S>.Parser, binder:(T)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
     return bind(x, binder: binder)
 }
 
-func bind_<T, R, S:CollectionType >(x: CPS<T, R, S>.Parser,
-        y:CPS<T, R, S>.Passing) -> CPS<T, R, S>.Passing {
-    return {(state: BasicState<S>) -> (R?, ParsecStatus) in
-        let (_, status) = x(state)
-        switch status {
+func bind_<T, R, S:CollectionType >(x: Parsec<T, S>.Parser,
+        y:Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+    return {(state: BasicState<S>) -> Result<R, SimpleError<S.Index>> in
+        let re = x(state)
+        switch re {
         case .Success:
             return y(state)
-        default:
-            return (nil, status)
+        case let .Failed(err):
+            return Result.Failed(err)
         }
     }
 }
 infix operator >> { associativity left }
-func >> <T, R, S:CollectionType>(x: CPS<T, R, S>.Parser, y:CPS<T, R, S>.Passing)  -> CPS<T, R, S>.Passing {
+func >> <T, R, S:CollectionType>(x: Parsec<T, S>.Parser, y: Parsec<R, S>.Parser)  -> Parsec<R, S>.Parser {
     return bind_(x, y: y)
 }
 
-func between<T, S:CollectionType>(b:Parsec<T, S>.Parser, e:Parsec<T, S>.Parser,
+func between<B, E, T, S:CollectionType>(b:Parsec<B, S>.Parser, e:Parsec<E, S>.Parser,
         p:Parsec<T, S>.Parser)->Parsec<T, S>.Parser{
-    return {(state: BasicState<S>) -> (T?, ParsecStatus) in
-        let keep = {(data:T?)->Parsec<T, S>.Parser in
+    return {(state: BasicState<S>) -> Result<T, SimpleError<S.Index>> in
+        let keep = {(data:T)->Parsec<T, S>.Parser in
             return (e >> pack(data))
         }
         return (b >> (p>>=keep))(state)
     }
 }
 
-func many<T, S:CollectionType >(p:Parsec<T, S>.Parser) -> Parsec<[T?], S>.Parser {
-    return {(state: BasicState<S>) -> ([T?]?, ParsecStatus) in
+func many<T, S:CollectionType >(p:Parsec<T, S>.Parser) -> Parsec<[T], S>.Parser {
+    return {(state: BasicState<S>) -> Result<[T], SimpleError<S.Index>> in
         return (many1(`try`(p)) <|> pack([]))(state)
     }
 }
 
 postfix operator >* { }
-postfix func >* <T, S:CollectionType>(p: Parsec<T, S>.Parser)  -> Parsec<[T?], S>.Parser {
+postfix func >* <T, S:CollectionType>(p: Parsec<T, S>.Parser)  -> Parsec<[T], S>.Parser {
     return many(p)
 }
 
-func many1<T, S:CollectionType>(p: Parsec<T, S>.Parser)->Parsec<[T?], S>.Parser {
-    let helper = {(start:T?)->Parsec<[T?], S>.Parser in
-        return {(state:BasicState<S>)->([T?]?, ParsecStatus) in
-            var res:[T?] = [start]
+func many1<T, S:CollectionType>(p: Parsec<T, S>.Parser)->Parsec<[T], S>.Parser {
+    let helper = {(start:T)->Parsec<[T], S>.Parser in
+        return {(state:BasicState<S>)->Result<[T], SimpleError<S.Index>> in
+            var res:[T] = [start]
             while true {
-                let (re, status) = `try`(p)(state)
-                switch status {
-                case .Success:
-                    res.append(re)
+                let re = `try`(p)(state)
+                switch re {
+                case let .Success(data):
+                    res.append(data)
                 case .Failed:
-                    return (res, ParsecStatus.Success)
+                    return Result.Success(res)
                 }
             }
         }
@@ -178,68 +189,57 @@ func many1<T, S:CollectionType>(p: Parsec<T, S>.Parser)->Parsec<[T?], S>.Parser 
 }
 
 postfix operator >+ { }
-postfix func >+ <T, S:CollectionType>(p: Parsec<T, S>.Parser)  -> Parsec<[T?], S>.Parser {
-    return many(p)
+postfix func >+ <T, S:CollectionType>(p: Parsec<T, S>.Parser)  -> Parsec<[T], S>.Parser {
+    return many1(p)
 }
 
 func manyTil<T, TilType, S:CollectionType>(p:Parsec<T, S>.Parser,
-        end:Parsec<TilType, S>.Parser)->Parsec<[T?], S>.Parser{
-    let term = `try`(end) >> pack([T?]())
-    return term <|> (many1(p) >>= {(re:[T?]?)->Parsec<[T?], S>.Parser in
+        end:Parsec<TilType, S>.Parser)->Parsec<[T], S>.Parser{
+    let term = `try`(end) >> pack([T]())
+    return term <|> (many1(p) >>= {(re:[T])->Parsec<[T], S>.Parser in
         return term >> pack(re)
     })
 }
 
-func zeroOrOnce<T, S>(p:Parsec<T, S>.Parser)->Parsec<T, S>.Parser{
-    return `try`(p) <|> pack(nil)
+func zeroOrOnce<T, S>(p:Parsec<T, S>.Parser)->Parsec<T?, S>.Parser{
+    return optional(`try`(p))
 }
 
 postfix operator >? { }
-postfix func >? <T, S:CollectionType>(x: Parsec<T, S>.Parser)  -> Parsec<T, S>.Parser {
+postfix func >? <T, S:CollectionType>(x: Parsec<T, S>.Parser)  -> Parsec<T?, S>.Parser {
     return zeroOrOnce(x)
 }
 
-//parsec maybe curry
-func maybe<T, X, S>(m:T, p:Parsec<X, S>.Parser)-> ((X)->T)->Parsec<T, S>.Parser {
-    return {(f:(X)->T)->Parsec<T, S>.Parser in
-        return maybe(m, p: p, f: f)
-    }
-}
-
-func maybe<T, X, S>(m:T, p:Parsec<X, S>.Parser, f:(X)->T) -> Parsec<T, S>.Parser {
-    return {(state:BasicState<S>)->(T?, ParsecStatus) in
-        let (val, status) = p(state)
-        switch status {
-        case .Success:
-            if val != nil {
-                return (f(val!), .Success)
-            }else{
-                return (nil, .Success)
-            }
-        case .Failed:
-            return (nil, status)
+func maybe<T, X, S:CollectionType>(m:T, p:Parsec<X, S>.Parser, f:(X)->T) -> Parsec<T, S>.Parser {
+    return {(state:BasicState<S>)-> Result<T, SimpleError<S.Index>> in
+        let re = p(state)
+        switch re {
+        case let .Success(val):
+            return Result.Success(f(val))
+        case let .Failed(err):
+            return Result.Failed(err)
         }
     }
 }
 
 func sepBy<T, SepType, S:CollectionType>(p: Parsec<T, S>.Parser,
-        sep:Parsec<SepType, S>.Parser)->Parsec<[T?], S>.Parser {
+        sep:Parsec<SepType, S>.Parser)->Parsec<[T], S>.Parser {
             return sepBy1(`try`(p), sep:`try`(sep)) <|> pack([])
 }
 
 func sepBy1<T, SepType, S:CollectionType>(p: Parsec<T, S>.Parser,
-        sep:Parsec<SepType, S>.Parser)->Parsec<[T?], S>.Parser {
-    let helper = {(start:T?)->Parsec<[T?], S>.Parser in
-        return {(state:BasicState<S>)->([T?]?, ParsecStatus) in
-            var res:[T?] = [start]
+        sep:Parsec<SepType, S>.Parser)->Parsec<[T], S>.Parser {
+    let helper = {(start:T)->Parsec<[T], S>.Parser in
+        return {(state:BasicState<S>)->Result<[T], SimpleError<S.Index>> in
+            var res:[T] = [start]
             let parser = `try`(sep)>>`try`(p)
             while true {
-                let (re, status) = parser(state)
-                switch status {
-                case .Success:
-                    res.append(re)
+                let re = parser(state)
+                switch re {
+                case let .Success(data):
+                    res.append(data)
                 case .Failed:
-                    return (res, ParsecStatus.Success)
+                    return Result.Success(res)
                 }
             }
         }
@@ -249,15 +249,15 @@ func sepBy1<T, SepType, S:CollectionType>(p: Parsec<T, S>.Parser,
 
 infix operator <- { associativity left }
 func <- <T, S:CollectionType>(inout x: T?, p: Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
-    return {(state:BasicState<S>)->(T?, ParsecStatus) in
-        let (re, status) = p(state)
-        switch status{
-        case .Success:
-            x=re
+    return {(state:BasicState<S>)->Result<T, SimpleError<S.Index>> in
+        let re = p(state)
+        switch re {
+        case let .Success(data):
+            x=data
         case .Failed:
             x=nil
         }
-        return (re, status)
+        return re
     }
 }
 

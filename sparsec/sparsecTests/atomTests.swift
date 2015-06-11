@@ -27,12 +27,12 @@ class atomTests: XCTestCase {
         let state = BasicState(data.unicodeScalars)
         let c:UnicodeScalar = "T"
         let t = char(c)
-        let (_, status) = t(state)
-        switch status {
+        let re = t(state)
+        switch re {
         case .Success:
             XCTAssert(true, "pass")
-        case let .Failed(msg):
-            XCTAssert(false, "excpet t parsec got 't' but got error: \(msg)")
+        case let .Failed(err):
+            XCTAssert(false, "excpet t parsec got 't' but got error: \(err.message)")
         }
     }
     
@@ -41,10 +41,10 @@ class atomTests: XCTestCase {
         let data = "07500"
         let state = BasicState(data.unicodeScalars)
         let num = digit
-        let (_, status) = num(state)
-        switch status {
-        case let .Failed(msg):
-            XCTAssert(false, "excpet digit parsec got a digit but error: \(msg)")
+        let re = num(state)
+        switch re {
+        case let .Failed(err):
+            XCTAssert(false, "excpet digit parsec got a digit but error: \(err.message)")
         case .Success:
             XCTAssert(true, "pass")
         }
@@ -52,25 +52,8 @@ class atomTests: XCTestCase {
 
     func testFMapFunction() {
         let x:Int? = 12
-        let y:Int? = 23
-        let r:Int? = fmap(x, y: y, functor: {(x, y)->Int in return x+y})
-        XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
-    }
-    
-    func testFMapOperator() {
-        let x:Int? = 12
-        let y:Int? = 23
-        let r:Int? = fmap(x, y: y, functor: +)
-        XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
-    }
-
-    func testFMapCurry() {
-        let x:Int? = 12
-        let y:Int? = 23
-        let fun = {(right:Int)->(Int)->Int in
-             return {(left:Int)->Int in return left+right}
-        }
-        let r:Int? = fmap(x, functor: fmap(y, functor: fun))
+        let y:Int = 23
+        let r:Int? = x.map({(d:Int)->Int in d+y})
         XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
@@ -78,12 +61,12 @@ class atomTests: XCTestCase {
         let data = "b"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        let (_, status) = one(c)(state)
-        switch status {
+        let re = one(c)(state)
+        switch re {
         case .Success:
             XCTAssert(true, "pass")
-        case let .Failed(msg):
-            XCTAssert(false, "excpet b parsec got 'b' but got error: \(msg)")
+        case let .Failed(err):
+            XCTAssert(false, "excpet b parsec got 'b' but got error: \(err.message)")
         }
     }
     
@@ -91,12 +74,12 @@ class atomTests: XCTestCase {
         let data = " "
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = " "
-        let (_, status) = one(c)(state)
-        switch status {
+        let re = one(c)(state)
+        switch re {
         case .Success:
             XCTAssert(true, "pass")
-        case let .Failed(msg):
-            XCTAssert(false, "excpet space parsec got 'space' but got error: \(msg)")
+        case let .Failed(err):
+            XCTAssert(false, "excpet space parsec got 'space' but got error: \(err.message)")
         }
     }
     
