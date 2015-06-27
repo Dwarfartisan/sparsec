@@ -31,10 +31,10 @@ class BasicState<S:CollectionType> {
             return Result.Failed(SimpleError(pos:self.pos, message:"eof"));
         }
         let item = container[self.pos]
-        self.pos = self.pos.successor()
+
         let match = pred(item)
+        self.pos = self.pos.successor()
         if match {
-            self.pos.successor()
             return Result.Success(item)
         }
         return Result.Failed(SimpleError(pos: self.pos, message: "predicate failed"))
