@@ -90,7 +90,7 @@ let int = optional(`try`(char("-"))) >>= {(x:UChr?) -> Parsec<String, UStr>.Pars
 
 func text(value:String)->Parsec<String, String.UnicodeScalarView>.Parser {
     return {(state: BasicState<UStr>)->Result<String, SimpleError<UStr.Index>> in
-        var scalars = value.unicodeScalars
+        let scalars = value.unicodeScalars
         for idx in scalars.startIndex...scalars.endIndex {
             let re = state.next()
             if re == nil {
