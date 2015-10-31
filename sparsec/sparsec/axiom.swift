@@ -8,16 +8,50 @@
 
 import Foundation
 
-enum Result<T, E>{
-    case Success(T)
-    case Failed(E)
+enum ParsecError<I> : ErrorType {
+    case Eof(pos:I)
+    case Parse(pos:I, message:String)
 }
 
-struct SimpleError<I> {
-    let pos:I
-    let message:String
+struct Parsec<T, S:State> {
+    typealias Parser = (S) throws -> T
 }
 
-struct Parsec<T, S:CollectionType> {
-    typealias Parser = (BasicState<S>)->Result<T, SimpleError<S.Index>>
+func bind<T, R, S:State>(x:Parsec<T, S>.Parser, _ binder:(T)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+    return {( state: S) throws -> R in
+        let data = try x(state)
+        return try binder(data)(state)
+    }
+}
+
+infix operator >>= { associativity left }
+func >>= <T, R, S:State>(x: Parsec<T, S>.Parser, binder:(T)->Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+    return bind(x, binder)
+}
+
+func then<T, R, S:State >(x: Parsec<T, S>.Parser,
+    _ y:Parsec<R, S>.Parser) -> Parsec<R, S>.Parser {
+        return {(state: S) throws -> R in
+            try x(state)
+            return try y(state)
+        }
+}
+
+infix operator >> { associativity left }
+func >> <T, R, S:State>(x: Parsec<T, S>.Parser, y: Parsec<R, S>.Parser)  -> Parsec<R, S>.Parser {
+    return then(x, y)
+}
+
+func over<T, R, S:State >(x: Parsec<T, S>.Parser,
+    _ y:Parsec<R, S>.Parser) -> Parsec<T, S>.Parser {
+        return {( state: S) throws -> T in
+            let data = try x(state)
+            try y(state)
+            return data
+        }
+}
+
+infix operator =>> { associativity left }
+func =>> <T, R, S:State>(x: Parsec<T, S>.Parser, y: Parsec<R, S>.Parser)  -> Parsec<T, S>.Parser {
+    return over(x, y)
 }

@@ -21,160 +21,93 @@ class propsTests: XCTestCase {
         super.tearDown()
     }
 
-    func testUnsignedFloat1() {
+    func testUnsignedFloat1() throws {
         // This is an example of a functional test case.
         let data = "3.15926"
         let state = BasicState(data.unicodeScalars)
-        let num = unsignedFloat
-        let re = num(state)
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(value):
-            XCTAssert(value == data, "float test success and got:\(data)")
-        }
+        let re = try ufloat(state)
+        print(re)
     }
     
-    func testUnsignedFloat2() {
+    func testUnsignedFloat2() throws {
         // This is an example of a functional test case.
         let data = ".15926"
         let state = BasicState(data.unicodeScalars)
-        let num = unsignedFloat
-        let re = num(state)
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(val):
-            XCTAssert(val == data, "float test success and got:\(val)")
-        }
+        let re = try ufloat(state)
+        print(re)
     }
     
-    func testUnsignedFloat3() {
+    func testUnsignedFloat3() throws {
         // This is an example of a functional test case.
         let data = "3.15926f"
         let state = BasicState(data.unicodeScalars)
-        let num = unsignedFloat
-        let re = num(state)
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(value):
-            XCTAssert(value == "3.15926", "float test success and got:\(value)")
-        }
+        let re = try ufloat(state)
+        print(re)
     }
     
-    func testUnsignedFloat4() {
+    func testUnsignedFloat4() throws {
         // This is an example of a functional test case.
         let data = "315926"
         let state = BasicState(data.unicodeScalars)
-        let num = unsignedFloat
-        let re = num(state)
-        switch re {
-        case .Failed:
-            XCTAssert(true, "pass")
-        case .Success:
-            XCTAssert(false, "\(data) is not a float")
-        }
+        let re = try ufloat(state)
+        print(re)
     }
     
-    func testUnsignedFloat5() {
+    func testUnsignedFloat5() throws {
         // This is an example of a functional test case.
         let data = "beras3252.242"
         let state = BasicState(data.unicodeScalars)
-        let num = unsignedFloat
-        let re = num(state)
-        switch re {
-        case .Failed:
-            XCTAssert(true, "pass")
-        case .Success:
-            XCTAssert(false, "\(data) is not a float")
-        }
+        let re = try ufloat(state)
+        print(re)
     }
     
-    func testFloat1() {
+    func testFloat1() throws {
         // This is an example of a functional test case.
         let data = "3.15926"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(value):
-            XCTAssert(value == data, "float test success and got:\(value)")
-        }
+        let re = try float(state)
+        print(re)
     }
     
-    func testFloat2() {
+    func testFloat2() throws {
         // This is an example of a functional test case.
         let data = "-624.3"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
+        let re = try float(state)
         print("result : \(re)")
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(value):
-            XCTAssert(value == data, "float test success and got:\(value)")
-        }
+        print(re)
     }
     
-    func testFloat3() {
+    func testFloat3() throws {
         // This is an example of a functional test case.
         let data = "-624.3dsfgasd"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
+        let re = try float(state)
         print("re, status : \(re)")
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet float parsec got a float but error: \(err.message)")
-        case let .Success(value):
-            XCTAssert(value == "-624.3", "float test success and got:\(value)")
-        }
     }
     
-    func testFloat4() {
+    func testFloat4() throws {
         // This is an example of a functional test case.
         let data = "-6243"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
-        switch re {
-        case .Failed:
-            XCTAssert(true, "pass")
-        case .Success:
-            XCTAssert(false, "\(data) is not a float")
-        }
+        let re = try float(state)
+        print(re)
     }
     
-    func testFloat5() {
+    func testFloat5() throws {
         // This is an example of a functional test case.
         let data = "315926"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
-        switch re {
-        case .Failed:
-            XCTAssert(true, "pass")
-        case .Success:
-            XCTAssert(false, "\(data) is not a float")
-        }
+        let re = try float(state)
+        print(re)
     }
     
-    func testFloat6() {
+    func testFloat6() throws {
         // This is an example of a functional test case.
         let data = "beras3252.242"
         let state = BasicState(data.unicodeScalars)
-        let num = float
-        let re = num(state)
-        switch re {
-        case .Failed:
-            XCTAssert(true, "pass")
-        case .Success:
-            XCTAssert(false, "\(data) is not a float")
-        }
+        let re = try float(state)
+        print(re)
     }
 
     func testPerformanceExample() {

@@ -23,276 +23,163 @@ class combTests: XCTestCase {
         super.tearDown()
     }
 
-    func testTry() {
+    func testTry() throws {
         let data = "t1"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        let re = `try`(one(c))(state)
+        let re = try attempt(eq(c))(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "c is equal to data[0] but got error: \(err.message)")
-        }
     }
     
-    func testEither1a() {
+    func testEither1a() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        let re = either(`try`(one(c)), y: one(d))(state)
+        let re = try either(attempt(char(c)), char(d))(state)
         print("re, : \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "data[0] is equal to c or to d but got error: \(err.message)")
-        }
     }
     
-    func testEither2a() {
+    func testEither2a() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        let re = either(one(c), y: one(d))(state)
+        let re = try either(char(c), char(d))(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data[0] is equal to c but got error")
-        case .Failed:
-            XCTAssert(true)
-        }
     }
     
-    func testEither3a() {
+    func testEither3a() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "v"
-        let re = either(`try`(one(c)), y: one(d))(state)
+        let re = try either(attempt(eq(c)), eq(d))(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data is neither equal to c nor to d")
-        case .Failed:
-            XCTAssert(true)
-        }
     }
     
-    func testEither1b() {
+    func testEither1b() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        let re = (`try`(one(c)) <|> one(d))(state)
+        let re = try (attempt(eq(c)) <|> eq(d))(state)
         print("re, status: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "data[0] is either equal to c or to d but got error: \(err.message)")
-        }
     }
     
-    func testEither2b() {
+    func testEither2b() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "t"
-        let re = (one(c) <|> one(d))(state)
+        let re = try (char(c) <|> char(d))(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data[0] is equal to c but error")
-        case .Failed:
-            XCTAssert(true)
-        }
     }
     
-    func testEither3b() {
+    func testEither3b() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "u"
         let d: UnicodeScalar = "v"
-        let re = (`try`(one(c)) <|> one(d))(state)
+        let re = try (attempt(char(c)) <|> char(d))(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data is neither equal to c nor to d")
-        case .Failed:
-            XCTAssert(true)
-        }
     }
     
-    func testOtherwise1a() {
+    func testOtherwise1a() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        let re = otherwise(one(c), message: "data is not equal to c")(state)
+        let re = try otherwise(char(c), "data is not equal to c")(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true)
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
     
-    func testOtherwise2a() {
+    func testOtherwise2a() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        let re = otherwise(one(c), message: "data is not equal to c")(state)
+        let re = try otherwise(char(c), "data is not equal to c")(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false)
-        case let .Failed(err):
-            XCTAssert(true, err.message)
-        }
     }
     
-    func testOtherwise1b() {
+    func testOtherwise1b() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "t"
-        let re = (one(c) <?> "data is not equal to c")(state)
+        let re = try (char(c) <?> "data is not equal to c")(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true)
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
     
-    func testOtherwise2b() {
+    func testOtherwise2b() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        let re = (one(c) <?> "data is not equal to c")(state)
+        let re = try (char(c) <?> "data is not equal to c")(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false)
-        case let .Failed(err):
-            XCTAssert(true, err.message)
-        }
     }
     
-    func testOption() {
+    func testOption() throws {
         let data = "t"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "1"
         let d: UnicodeScalar = "d"
 
-        let re = option(`try`(one(c)), value: d)(state)
+        let re = try option(attempt(char(c)), d)(state)
         print("re: \(re)")
-        switch re {
-        case let .Success(value):
-            XCTAssert(value==d, "re is \(value) and equal to \(d)")
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
     
-    func testOneOf1() {
+    func testOneOf1() throws {
         let data = "2"
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        let re = oneOf(c.unicodeScalars)(state)
-        
+        let re = try oneOf(c.unicodeScalars)(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true)
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
     
-    func testOneOf2() {
+    func testOneOf2() throws {
         let data = "b"
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        let re = oneOf(c.unicodeScalars)(state)
+        let re = try oneOf(c.unicodeScalars)(state)
         
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data is not in c")
-        case let .Failed(err):
-            XCTAssert(true, err.message)
-        }
     }
 
-    func testOneOf3() {
+    func testOneOf3() throws {
         let data = " "
         let state = BasicState(data.unicodeScalars)
         let c = "3fs 2ad1"
         
-        let re = oneOf(c.unicodeScalars)(state)
-        
+        let re = try oneOf(c.unicodeScalars)(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true, "data \(data) is not in c \(c)")
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
     
-    func testNoneOf1() {
+    func testNoneOf1() throws {
         let data = "b"
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        let re = noneOf(c.unicodeScalars)(state)
-        
+        let re = try noneOf(c.unicodeScalars)(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(true)
-        case let .Failed(err):
-            XCTAssert(false, err.message)
-        }
     }
 
-    func testNoneOf2() {
+    func testNoneOf2() throws {
         let data = "2"
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
         
-        let re = noneOf(c.unicodeScalars)(state)
-        
+        let re = try noneOf(c.unicodeScalars)(state)
         print("(re, status): \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data is not in c")
-        case let .Failed(err):
-            XCTAssert(true, err.message)
-        }
     }
     
-    func testNoneOf3() {
+    func testNoneOf3() throws {
         let data = " "
         let state = BasicState(data.unicodeScalars)
         let c = "3fs 2a d1"
         
-        let re = noneOf(c.unicodeScalars)(state)
-        
+        let re = try noneOf(c.unicodeScalars)(state)
         print("re: \(re)")
-        switch re {
-        case .Success:
-            XCTAssert(false, "data \(data) is not in c \(c)")
-        case let .Failed(err):
-            XCTAssert(true, err.message)
-        }
     }
 
     func testPerformanceExample() {

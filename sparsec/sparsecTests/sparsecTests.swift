@@ -21,29 +21,26 @@ class sparsecTests: XCTestCase {
         super.tearDown()
     }
     
-    func testString() {
+    func testString() throws {
         let data = "This is a \\\"string\\\"";
-        let escape = char("\\") >> (
-                            `try`(char("t")>>pack("\t" as UnicodeScalar))
-                        <|> `try`(char("n")>>pack("\n" as UnicodeScalar))
-                        <|> `try`(char("\"")>>pack("\"" as UnicodeScalar))
-                        <|> {(state)->Result<UnicodeScalar, SimpleError<String.UnicodeScalarView.Index>> in
-                                let the_char = state.next({(x)->Bool in false})
-                                return Result.Failed(SimpleError(pos: state.pos, message:"unknown escape char \(the_char)"))
-                            })
+        let escape = {( state:BasicState<UStr>) throws ->UChr in
+            try char("\\")(state)
+            let c = try state.next()
+            switch c {
+                case "t": return "\t"
+                case "n": return "\n"
+                case "\"": return "\""
+            default:
+                throw ParsecError.Parse(pos: state.pos, message: "unknown escape char \(c)")
+            }
+        }
         
-        let strExpr = many1(`try`(noneOf(("\\" as String).unicodeScalars)) <|> escape) >>= {(x:[UnicodeScalar])->Parsec<[UnicodeScalar], String.UnicodeScalarView>.Parser in
+        let strExpr = many1(attempt(noneOf("\\".unicodeScalars)) <|> escape) >>= {(x:[UnicodeScalar]) in
             return eof >> pack(x)
         }
         let state = BasicState(data.unicodeScalars)
-        let re = strExpr(state)
-        switch re {
-        case let .Success(data):
-            let output = ucs2str(data)
-            print("string test passed, got: \(output)")
-        case let .Failed(msg):
-            XCTAssert(false, "string test failed, got: \(msg)")
-        }
+        let re = try strExpr(state)
+        print(re)
     }
     
     func testPerformanceExample() {

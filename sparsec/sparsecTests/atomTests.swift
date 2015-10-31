@@ -21,33 +21,21 @@ class atomTests: XCTestCase {
         super.tearDown()
     }
 
-    func testChar() {
+    func testChar() throws {
         // This is an example of a functional test case.
         let data = "This is a String."
         let state = BasicState(data.unicodeScalars)
         let c:UnicodeScalar = "T"
-        let t = char(c)
-        let re = t(state)
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "excpet t parsec got 't' but got error: \(err.message)")
-        }
+        let re = try char(c)(state)
+        print(re)
     }
     
-    func testDigit() {
+    func testDigit() throws {
         // This is an example of a functional test case.
         let data = "07500"
         let state = BasicState(data.unicodeScalars)
-        let num = digit
-        let re = num(state)
-        switch re {
-        case let .Failed(err):
-            XCTAssert(false, "excpet digit parsec got a digit but error: \(err.message)")
-        case .Success:
-            XCTAssert(true, "pass")
-        }
+        let re = try digit(state)
+        print(re)
     }
 
     func testFMapFunction() {
@@ -57,30 +45,20 @@ class atomTests: XCTestCase {
         XCTAssert(r!==35, "Expect a int? is 35 but got \(r)")
     }
 
-    func testOne1() {
+    func testEq() throws {
         let data = "b"
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = "b"
-        let re = one(c)(state)
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "excpet b parsec got 'b' but got error: \(err.message)")
-        }
+        let re = try eq(c)(state)
+        print(re)
     }
     
-    func testOne2() {
+    func testOne2() throws {
         let data = " "
         let state = BasicState(data.unicodeScalars)
         let c: UnicodeScalar = " "
-        let re = one(c)(state)
-        switch re {
-        case .Success:
-            XCTAssert(true, "pass")
-        case let .Failed(err):
-            XCTAssert(false, "excpet space parsec got 'space' but got error: \(err.message)")
-        }
+        let re = try eq(c)(state)
+        print(re)
     }
     
     func testPerformanceExample() {

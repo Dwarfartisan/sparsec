@@ -16,8 +16,8 @@
 		3923ADDF1AB9EF9A00D3D0D4 /* combinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C6B5071AB6B32000F566A0 /* combinator.swift */; };
 		3927B71C1ABEAA680018D180 /* axiom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3927B71B1ABEAA680018D180 /* axiom.swift */; };
 		3927B71D1ABEC3C40018D180 /* axiom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3927B71B1ABEAA680018D180 /* axiom.swift */; };
-		3927B71E1ABFD8A70018D180 /* proposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396335E01ABAC99C001B7208 /* proposition.swift */; };
-		396335E11ABAC99C001B7208 /* proposition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396335E01ABAC99C001B7208 /* proposition.swift */; };
+		3927B71E1ABFD8A70018D180 /* text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396335E01ABAC99C001B7208 /* text.swift */; };
+		396335E11ABAC99C001B7208 /* text.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396335E01ABAC99C001B7208 /* text.swift */; };
 		39D0F3181AAD6992003B56CE /* state.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D0F3171AAD6992003B56CE /* state.swift */; };
 		39D0F3191AAD6992003B56CE /* state.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D0F3171AAD6992003B56CE /* state.swift */; };
 		39DB5C451AA6D2860069AA30 /* sparsec.h in Headers */ = {isa = PBXBuildFile; fileRef = 39DB5C441AA6D2860069AA30 /* sparsec.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -44,7 +44,7 @@
 		3907CE541AAEF7AC00CD70A3 /* definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = definition.swift; sourceTree = "<group>"; };
 		3907CE581AAEF8A500CD70A3 /* elementsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = elementsTests.swift; sourceTree = "<group>"; };
 		3927B71B1ABEAA680018D180 /* axiom.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = axiom.swift; sourceTree = "<group>"; };
-		396335E01ABAC99C001B7208 /* proposition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = proposition.swift; sourceTree = "<group>"; };
+		396335E01ABAC99C001B7208 /* text.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = text.swift; sourceTree = "<group>"; };
 		39A5F5F41AAC46F80050D65D /* parsec.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = parsec.playground; sourceTree = "<group>"; };
 		39C6B5071AB6B32000F566A0 /* combinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = combinator.swift; sourceTree = "<group>"; };
 		39D0F3171AAD6992003B56CE /* state.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = state.swift; sourceTree = "<group>"; };
@@ -105,10 +105,10 @@
 				39DB5C421AA6D2860069AA30 /* Supporting Files */,
 				3907CE541AAEF7AC00CD70A3 /* definition.swift */,
 				3927B71B1ABEAA680018D180 /* axiom.swift */,
-				39C6B5071AB6B32000F566A0 /* combinator.swift */,
-				396335E01ABAC99C001B7208 /* proposition.swift */,
-				39D0F3171AAD6992003B56CE /* state.swift */,
 				3907CE4C1AAEF2D200CD70A3 /* atom.swift */,
+				39C6B5071AB6B32000F566A0 /* combinator.swift */,
+				396335E01ABAC99C001B7208 /* text.swift */,
+				39D0F3171AAD6992003B56CE /* state.swift */,
 			);
 			path = sparsec;
 			sourceTree = "<group>";
@@ -253,7 +253,7 @@
 			files = (
 				3927B71C1ABEAA680018D180 /* axiom.swift in Sources */,
 				3923ADDC1AB9E2F500D3D0D4 /* atom.swift in Sources */,
-				396335E11ABAC99C001B7208 /* proposition.swift in Sources */,
+				396335E11ABAC99C001B7208 /* text.swift in Sources */,
 				3923ADDE1AB9EF9900D3D0D4 /* combinator.swift in Sources */,
 				3907CE551AAEF7AC00CD70A3 /* definition.swift in Sources */,
 				39D0F3181AAD6992003B56CE /* state.swift in Sources */,
@@ -266,7 +266,7 @@
 			files = (
 				F1034A151ACE6C6B0017C1B0 /* defineTests.swift in Sources */,
 				3923ADDD1AB9E2F600D3D0D4 /* atom.swift in Sources */,
-				3927B71E1ABFD8A70018D180 /* proposition.swift in Sources */,
+				3927B71E1ABFD8A70018D180 /* text.swift in Sources */,
 				F1034A191ACE75E50017C1B0 /* atomTests.swift in Sources */,
 				3907CE561AAEF7AC00CD70A3 /* definition.swift in Sources */,
 				39DB5C521AA6D2860069AA30 /* sparsecTests.swift in Sources */,

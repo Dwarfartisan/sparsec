@@ -8,41 +8,32 @@
 
 import Foundation
 
-class BasicState<S:CollectionType> {
+protocol State {
+    typealias T;
+    typealias I;
+    mutating func next() throws -> T
+    var pos : I{get set};
+}
+
+class BasicState<S:CollectionType>{
     typealias T = S.Generator.Element
+    typealias I = S.Index
     var container: S
-    var pos : S.Index
     init(_ container: S) {
         self.container = container
         self.pos = container.startIndex
     }
+    var pos : S.Index
+}
 
-    func next() -> T? {
+extension BasicState:State {
+    func next() throws -> T {
         if self.pos == self.container.endIndex.successor() {
-            return nil
+            throw ParsecError.Eof(pos: self.pos)
         }
         let item = container[self.pos]
         self.pos = self.pos.successor()
         return item
-    }
-
-    func next(pred : Equal<T>.Pred) -> Result<T, SimpleError<S.Index>> {
-        if self.pos == self.container.endIndex.successor() {
-            return Result.Failed(SimpleError(pos:self.pos, message:"eof"));
-        }
-        let item = container[self.pos]
-
-        let match = pred(item)
-        self.pos = self.pos.successor()
-        if match {
-            return Result.Success(item)
-        }
-        return Result.Failed(SimpleError(pos: self.pos, message: "predicate failed"))
-    }
-    subscript(idx: S.Index) -> T? {
-        get {
-            return container[idx]
-        }
     }
 }
 
