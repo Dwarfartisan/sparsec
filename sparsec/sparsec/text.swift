@@ -76,15 +76,15 @@ func int<S:State where S.T==UChr>(state: S) throws -> String {
 }
 
 func ufloat<S:State where S.T==UChr, S.I:Equatable>(state: S) throws -> String {
-    let left = try option(attempt(uint), "0" as String)(state)
+    let left = try option("0" as String, attempt(uint))(state)
     try char(".")(state)
     let right = try uint(state)
     return "\(left).\(right)"
 }
 
 func float<S:State where S.T==UChr, S.I:Equatable>(state: S) throws -> String {
-    let sign = try option(attempt(char("-") >> pack("-" as String)), "" as String)(state)
-    let left = try option(attempt(uint), "0")(state)
+    let sign = try option("" as String, attempt(char("-") >> pack("-" as String)))(state)
+    let left = try option("0", attempt(uint))(state)
     try char(".")(state)
     let right = try uint(state)
     return "\(sign)\(left).\(right)"

@@ -75,18 +75,21 @@ func subj<T:Equatable, S:State where S.T==T >
     }
 }
 
+// 即 Haskell 的 return 或 pure 操作，将一个值封装为 parsec 算子
 func pack<T, S:State>(value:T)->Parsec<T, S>.Parser {
     return {( state: S) throws -> T in
         return value
     }
 }
 
+// 给出指定的错误信息
 func fail<S:State>(message:String)->Parsec<S.T, S>.Parser {
     return {(var state: S) throws -> S.T in
         throw ParsecError.Parse(pos: state.pos, message: message)
     }
 }
 
+// 期待迭代到的元素是给定集合中的某一个
 func oneOf<T:Equatable, Es:SequenceType, S:State
     where S.T==T, Es.Generator.Element==T>(elements:Es)->Parsec<T, S>.Parser {
         return {(var state: S) throws -> T in
@@ -100,6 +103,7 @@ func oneOf<T:Equatable, Es:SequenceType, S:State
         }
 }
 
+// 期待迭代到的元素不是给定集合中的任何一个
 func noneOf<T:Equatable, Es:SequenceType, S:State
     where Es.Generator.Element==T, S.T==T> (elements:Es)->Parsec<T, S>.Parser {
         return {(var state: S) throws -> T in

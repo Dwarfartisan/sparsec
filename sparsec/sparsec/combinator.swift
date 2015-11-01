@@ -8,6 +8,7 @@
 
 import Foundation
 
+// 即 Haskell Parsec 的 try 算子，如果发生错误，将 state 复位
 func attempt<T, S:State>(parsec: (S) throws->T) -> (S) throws -> T {
     return {(var state: S) throws -> T in
         let p = state.pos
@@ -21,6 +22,7 @@ func attempt<T, S:State>(parsec: (S) throws->T) -> (S) throws -> T {
     }
 }
 
+// 如果第一个算子成功，返回其结果，否则要检查其是否复位，如果复位，就尝试第二个算子并返回其结果
 func either<T, S:State where S.I:Equatable>(x: Parsec<T, S>.Parser, _ y: Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
     return {(var state: S) throws -> T in
         let p = state.pos
@@ -37,12 +39,14 @@ func either<T, S:State where S.I:Equatable>(x: Parsec<T, S>.Parser, _ y: Parsec<
     }
 }
 
+// either 的中置运算符形式
 infix operator <|> { associativity left }
 func <|><T, S:State where S.I:Equatable>(left: Parsec<T, S>.Parser,
         right: Parsec<T, S>.Parser)  -> Parsec<T, S>.Parser {
     return either(left, right)
 }
 
+// 如果给定算子发生错误，给出指定的错误信息
 func otherwise<T, S:State >(x:Parsec<T, S>.Parser, _ message:String)->Parsec<T, S>.Parser {
     return {(var state: S) throws -> T in
         do {
@@ -54,12 +58,14 @@ func otherwise<T, S:State >(x:Parsec<T, S>.Parser, _ message:String)->Parsec<T, 
     }
 }
 
+// otherwise 的中置运算符形式
 infix operator <?> { associativity left }
 func <?><T, S:State>(x: Parsec<T, S>.Parser, message: String)  -> Parsec<T, S>.Parser {
     return otherwise(x, message)
 }
 
-func option<T, S:State where S.I:Equatable>(parsec:Parsec<T, S>.Parser, _ value:T) -> Parsec<T, S>.Parser {
+// 如果给定算子发生错误，给出指定的值
+func option<T, S:State where S.I:Equatable>(value:T, _ parsec:Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
     return {(var state: S) throws -> T in
         let p = state.pos
         do {
@@ -75,11 +81,15 @@ func option<T, S:State where S.I:Equatable>(parsec:Parsec<T, S>.Parser, _ value:
     }
 }
 
-func between<B, E, T, S:State>(b:Parsec<B, S>.Parser, _ e:Parsec<E, S>.Parser,
+
+func between<B, E, T, S:State>(open:Parsec<B, S>.Parser, _ close:Parsec<E, S>.Parser,
         _ p:Parsec<T, S>.Parser)->Parsec<T, S>.Parser{
     return {( state: S) throws -> T in
-        let exp = (b >> p =>> e)
-        return try exp(state)
+        // return try (open >> p =>> close)(state)
+        try open(state)
+        let re = try p(state)
+        try close(state)
+        return re
     }
 }
 

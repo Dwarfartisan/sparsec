@@ -123,7 +123,7 @@ class combTests: XCTestCase {
         let c: UnicodeScalar = "1"
         let d: UnicodeScalar = "d"
 
-        let re = try option(attempt(char(c)), d)(state)
+        let re = try option(d, attempt(char(c)))(state)
         print("re: \(re)")
     }
     
@@ -168,7 +168,6 @@ class combTests: XCTestCase {
         let data = "2"
         let state = BasicState(data.unicodeScalars)
         let c = "3fs2ad1"
-        
         let re = try noneOf(c.unicodeScalars)(state)
         print("(re, status): \(re)")
     }
