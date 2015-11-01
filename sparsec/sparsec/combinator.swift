@@ -81,7 +81,7 @@ func option<T, S:State where S.I:Equatable>(value:T, _ parsec:Parsec<T, S>.Parse
     }
 }
 
-
+// 给出在指定起止算子之间的给定算子的计算结果
 func between<B, E, T, S:State>(open:Parsec<B, S>.Parser, _ close:Parsec<E, S>.Parser,
         _ p:Parsec<T, S>.Parser)->Parsec<T, S>.Parser{
     return {( state: S) throws -> T in
@@ -93,6 +93,7 @@ func between<B, E, T, S:State>(open:Parsec<B, S>.Parser, _ close:Parsec<E, S>.Pa
     }
 }
 
+// 匹配给定算子0到多次
 func many<T, S:State >(p:Parsec<T, S>.Parser) -> Parsec<[T], S>.Parser {
     return {( state: S) throws -> [T] in
         var re = [T]()
@@ -110,11 +111,7 @@ func many<T, S:State >(p:Parsec<T, S>.Parser) -> Parsec<[T], S>.Parser {
     }
 }
 
-postfix operator >* { }
-postfix func >* <T, S:State>(p: Parsec<T, S>.Parser)  -> Parsec<[T], S>.Parser {
-    return many(p)
-}
-
+// 匹配给定算子一到多次
 func many1<T, S:State>(p: Parsec<T, S>.Parser)->Parsec<[T], S>.Parser {
     return {( state: S) throws -> [T] in
         let start = try p(state)
@@ -133,16 +130,13 @@ func many1<T, S:State>(p: Parsec<T, S>.Parser)->Parsec<[T], S>.Parser {
     }
 }
 
-postfix operator >+ { }
-postfix func >+ <T, S:State>(p: Parsec<T, S>.Parser)  -> Parsec<[T], S>.Parser {
-    return many1(p)
-}
-
+// 匹配给定算子0到多次，并以指定的算子结尾
 func manyTil<T, TilType, S:State>(p:Parsec<T, S>.Parser,
         tail:Parsec<TilType, S>.Parser)->Parsec<[T], S>.Parser{
     return (many(p) =>> tail)
 }
 
+// 匹配给定算子0到1次，失败返回 nil
 func zeroOrOnce<T, S:State>(p:Parsec<T, S>.Parser)->Parsec<T?, S>.Parser{
     return{( state: S) throws -> T? in
         do{
@@ -154,11 +148,7 @@ func zeroOrOnce<T, S:State>(p:Parsec<T, S>.Parser)->Parsec<T?, S>.Parser{
     }
 }
 
-postfix operator >? { }
-postfix func >? <T, S:State>(x: Parsec<T, S>.Parser)  -> Parsec<T?, S>.Parser {
-    return zeroOrOnce(x)
-}
-
+// 以指定算子分隔的 many 匹配
 func sepBy<T, SepType, S:State>(p: Parsec<T, S>.Parser,
         sep:Parsec<SepType, S>.Parser)->Parsec<[T], S>.Parser {
         return {( state: S) throws -> [T] in
@@ -179,6 +169,7 @@ func sepBy<T, SepType, S:State>(p: Parsec<T, S>.Parser,
         }
 }
 
+// 以指定算子分隔的 many1 匹配
 func sepBy1<T, SepType, S:State>(p: Parsec<T, S>.Parser,
         sep:Parsec<SepType, S>.Parser)->Parsec<[T], S>.Parser {
     return {(state: S) throws ->[T] in
@@ -195,6 +186,39 @@ func sepBy1<T, SepType, S:State>(p: Parsec<T, S>.Parser,
             }
         }
         return re
+    }
+}
+
+// 跳过给定算子0到多次
+func skip<T, S:State >(p:Parsec<T, S>.Parser) -> Parsec<T?, S>.Parser {
+    return {( state: S) throws -> T? in
+        let psc = attempt(p)
+        do {
+            while true {
+                let re = try? psc(state)
+                if re == nil {
+                    break
+                }
+            }
+        }
+        return nil
+    }
+}
+
+// 跳过给定算子 1 到多次
+func skip1<T, S:State>(p: Parsec<T, S>.Parser)->Parsec<T?, S>.Parser {
+    return {( state: S) throws -> T? in
+        try p(state)
+        let psc = attempt(p)
+        do {
+            while true {
+                let re = try? psc(state)
+                if re == nil {
+                    break
+                }
+            }
+        }
+        return nil
     }
 }
 
