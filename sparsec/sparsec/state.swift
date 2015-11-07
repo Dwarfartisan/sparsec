@@ -11,6 +11,7 @@ import Foundation
 protocol State {
     typealias T
     typealias I
+    typealias Trans
     mutating func next() throws -> T
     var pos : I{get}
     mutating func begin() -> I
@@ -21,6 +22,7 @@ protocol State {
 class BasicState<S:CollectionType>{
     typealias T = S.Generator.Element
     typealias I = S.Index
+    typealias Trans = S.Index
     var container: S
     
     init(_ container: S) {
@@ -48,19 +50,19 @@ extension BasicState:State {
         self.pos = self.pos.successor()
         return item
     }
-    func begin() -> BasicState.I {
+    func begin() -> BasicState.Trans {
         if self.tran == nil {
             self.tran = self.pos
         }
         return self.pos
     }
     
-    func commit(tran: BasicState.I) {
+    func commit(tran: BasicState.Trans) {
         if self.tran == tran {
             self.tran = nil
         }
     }
-    func rollback(tran: I) {
+    func rollback(tran: Trans) {
         self._pos = tran
         if self.tran == tran {
             self.tran = nil
