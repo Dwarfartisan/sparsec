@@ -11,12 +11,13 @@ import Foundation
 // 即 Haskell Parsec 的 try 算子，如果发生错误，将 state 复位
 func attempt<T, S:State>(parsec: (S) throws->T) -> (S) throws -> T {
     return {(var state: S) throws -> T in
-        let p = state.pos
+        let tran = state.begin()
         do {
             let result = try parsec(state)
+            state.commit(tran)
             return result
         } catch let err {
-            state.pos = p
+            state.rollback(tran)
             throw err
         }
     }
@@ -24,7 +25,7 @@ func attempt<T, S:State>(parsec: (S) throws->T) -> (S) throws -> T {
 
 // 如果第一个算子成功，返回其结果，否则要检查其是否复位，如果复位，就尝试第二个算子并返回其结果
 func either<T, S:State where S.I:Equatable>(x: Parsec<T, S>.Parser, _ y: Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
-    return {(var state: S) throws -> T in
+    return {( state: S) throws -> T in
         let p = state.pos
         do {
             let re = try x(state)
@@ -48,7 +49,7 @@ func <|><T, S:State where S.I:Equatable>(left: Parsec<T, S>.Parser,
 
 // 如果给定算子发生错误，给出指定的错误信息
 func otherwise<T, S:State >(x:Parsec<T, S>.Parser, _ message:String)->Parsec<T, S>.Parser {
-    return {(var state: S) throws -> T in
+    return {( state: S) throws -> T in
         do {
             let re = try x(state)
             return re
@@ -66,7 +67,7 @@ func <?><T, S:State>(x: Parsec<T, S>.Parser, message: String)  -> Parsec<T, S>.P
 
 // 如果给定算子发生错误，给出指定的值
 func option<T, S:State where S.I:Equatable>(value:T, _ parsec:Parsec<T, S>.Parser) -> Parsec<T, S>.Parser {
-    return {(var state: S) throws -> T in
+    return {( state: S) throws -> T in
         let p = state.pos
         do {
             let re = try parsec(state)

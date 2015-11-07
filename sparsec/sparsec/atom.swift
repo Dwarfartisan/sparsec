@@ -84,7 +84,7 @@ func pack<T, S:State>(value:T)->Parsec<T, S>.Parser {
 
 // 给出指定的错误信息
 func fail<S:State>(message:String)->Parsec<S.T, S>.Parser {
-    return {(var state: S) throws -> S.T in
+    return {( state: S) throws -> S.T in
         throw ParsecError.Parse(pos: state.pos, message: message)
     }
 }

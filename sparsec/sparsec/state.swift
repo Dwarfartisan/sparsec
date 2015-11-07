@@ -9,21 +9,34 @@
 import Foundation
 
 protocol State {
-    typealias T;
-    typealias I;
+    typealias T
+    typealias I
     mutating func next() throws -> T
-    var pos : I{get set};
+    var pos : I{get}
+    mutating func begin() -> I
+    mutating func commit(_: I)
+    mutating func rollback(_: I)
 }
 
 class BasicState<S:CollectionType>{
     typealias T = S.Generator.Element
     typealias I = S.Index
     var container: S
+    
     init(_ container: S) {
         self.container = container
-        self.pos = container.startIndex
+        self._pos = container.startIndex
     }
-    var pos : S.Index
+    var pos : S.Index {
+        get {
+            return _pos
+        }
+        set(value){
+            _pos = value
+        }
+    }
+    private var tran: S.Index? = nil
+    private var _pos: S.Index
 }
 
 extension BasicState:State {
@@ -34,6 +47,24 @@ extension BasicState:State {
         let item = container[self.pos]
         self.pos = self.pos.successor()
         return item
+    }
+    func begin() -> BasicState.I {
+        if self.tran == nil {
+            self.tran = self.pos
+        }
+        return self.pos
+    }
+    
+    func commit(tran: BasicState.I) {
+        if self.tran == tran {
+            self.tran = nil
+        }
+    }
+    func rollback(tran: I) {
+        self._pos = tran
+        if self.tran == tran {
+            self.tran = nil
+        }
     }
 }
 
@@ -53,7 +84,7 @@ class LinesState<S:CollectionType where S.Index: IntegerArithmeticType>:
             return col
         }
     }
-    var _pos: S.Index
+    //var _pos: S.Index
     init(_ container: S, newline: Equal<T>.Pred){
         self.newline = newline
         self.row = container.startIndex
@@ -64,9 +95,8 @@ class LinesState<S:CollectionType where S.Index: IntegerArithmeticType>:
                 self.lines.append(index)
             }
         }
-        _pos = container.startIndex
         super.init(container)
-        
+        self.pos = container.startIndex
     }
     override var pos:S.Index {
         get {
