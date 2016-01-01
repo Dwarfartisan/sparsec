@@ -133,8 +133,8 @@ func many1<T, S:State>(p: Parsec<T, S>.Parser)->Parsec<[T], S>.Parser {
 
 // 匹配给定算子0到多次，并以指定的算子结尾
 func manyTil<T, TilType, S:State>(p:Parsec<T, S>.Parser,
-        tail:Parsec<TilType, S>.Parser)->Parsec<[T], S>.Parser{
-    return (many(p) =>> tail)
+        til:Parsec<TilType, S>.Parser)->Parsec<[T], S>.Parser{
+    return (many(p) =>> til)
 }
 
 // 匹配给定算子0到1次，失败返回 nil
