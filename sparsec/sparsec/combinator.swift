@@ -131,10 +131,21 @@ func many1<T, S:State>(p: Parsec<T, S>.Parser)->Parsec<[T], S>.Parser {
     }
 }
 
-// 匹配给定算子0到多次，并以指定的算子结尾
-func manyTil<T, TilType, S:State>(p:Parsec<T, S>.Parser,
-        til:Parsec<TilType, S>.Parser)->Parsec<[T], S>.Parser{
-    return (many(p) =>> til)
+// 匹配给定算子0到多次，并以指定的算子结尾，饥饿模式
+func manyTill<T, EndType, S:State>(p:Parsec<T, S>.Parser,
+        end:Parsec<EndType, S>.Parser)->Parsec<[T], S>.Parser{
+    return {(state: S) throws -> [T] in
+        var re:[T] = []
+        let ep = attempt(end)
+        while true{
+            do {
+                try ep(state)
+                return re;
+            } catch {
+                try re.append(p(state))
+            }
+        }
+    }
 }
 
 // 匹配给定算子0到1次，失败返回 nil
